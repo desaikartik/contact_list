@@ -1,7 +1,11 @@
 import 'dart:convert';
 
+import 'package:contact_list/update.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import 'addscreen.dart';
+import 'detailpage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +41,9 @@ class _MyHomePageState extends State<MyHomePage> {
   List<User> users = [];
   User? user;
   bool _isLoading = false;
+  String name = '';
+  String mobile = '';
+  bool _isdeleting = false;
 
   @override
   void initState() {
@@ -50,11 +57,11 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Colors.black87,
       appBar: AppBar(
         backgroundColor: Colors.black87,
-        title:const  Text(
+        title: const Text(
           'Contact',
-          style:  TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
         ),
-elevation: 0,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.star_border),
@@ -72,14 +79,20 @@ elevation: 0,
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){},child: const Icon(Icons.add,color: Colors.white,size: 30,),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showAlert(),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator.adaptive())
           : ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) => Card(
                 color: Colors.black45,
-                
                 child: ListTile(
                   onTap: () {
                     //inavigate with id
@@ -89,7 +102,6 @@ elevation: 0,
                             builder: (BuildContext context) =>
                                 DetailPage(id: users[index].id)));
                   },
-                  
                   leading:
                       //CircleAvatar(
                       //child:  ClipRRect(child: Image.network('${users[index].url}',fit: BoxFit.cover,)),),
@@ -101,10 +113,7 @@ elevation: 0,
                     '${users[index].name}',
                     style: const TextStyle(color: Colors.white),
                   ),
-                  trailing: const Icon(
-                    Icons.phone,
-                    color: Colors.white,
-                  ),
+                  trailing: const Icon(Icons.call),
                 ),
               ),
             ),
@@ -112,6 +121,7 @@ elevation: 0,
   }
 
   void getUsers() async {
+    users.clear();
     setState(() => _isLoading = true);
     http.Response res = await http.get(Uri.parse('$baseUrl/users/'));
 
@@ -122,12 +132,18 @@ elevation: 0,
           users.add(User(
             id: v['id'],
             name: v['name'],
-            url: v['avatar'],
-            createdAt: v['createdAt'],
           ));
         });
       });
       setState(() => _isLoading = false);
+    }
+  }
+
+  showAlert() async {
+    var res = await showDialog(
+        builder: (context) => const AddUpdateScreen(), context: context);
+    if (res != null && res == true) {
+      getUsers();
     }
   }
 }
@@ -136,189 +152,9 @@ elevation: 0,
 class User {
   final String? id;
   final String? name;
+  final String? mobile;
   final String? url;
   final String? createdAt;
 
-  User({this.id, this.name, this.url, this.createdAt});
-}
-
-class DetailPage extends StatefulWidget {
-  final String? id;
-  const DetailPage({Key? key, this.id}) : super(key: key);
-
-  @override
-  State<DetailPage> createState() => _DetailPageState();
-}
-
-class _DetailPageState extends State<DetailPage> {
-  User? user;
-
-  @override
-  void initState() {
-    super.initState();
-    getUser();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(96, 89, 83, 83),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 220, 175, 111),
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.star_border),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 15),
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 15),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
-          ),
-        ],
-        // leading: Icon(Icons.more_horiz),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: 270,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 220, 175, 111),
-                borderRadius: BorderRadius.circular(3)),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 70),
-                child:
-                    Text("${user?.name}", style: const TextStyle(fontSize: 25)),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30, right: 10, left: 10),
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.phone,
-                  color: Colors.green,
-                  size: 30,
-                ),
-                SizedBox(
-                  width: 30,
-                ),
-                Text(
-                  'Phone',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                SizedBox(width: 180),
-                Icon(
-                  Icons.video_call,
-                  color: Colors.green,
-                  size: 30,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Icon(
-                  Icons.message,
-                  color: Colors.blue,
-                  size: 30,
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 70, right: 20, left: 20),
-            child: Column(
-              children: [
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.whatsapp,
-                      color: Colors.green,
-                      size: 30,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text(
-                      'Voice Call',
-                      style: TextStyle(color: Colors.white, fontSize: 17),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.whatsapp,
-                      color: Colors.green,
-                      size: 30,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text(
-                      'Video Call',
-                      style: TextStyle(color: Colors.white, fontSize: 17),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 40),
-                Row(
-                  children: const [
-                    Icon(
-                      Icons.whatsapp,
-                      color: Colors.green,
-                      size: 30,
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Text(
-                      'Message',
-                      style: TextStyle(color: Colors.white, fontSize: 17),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 100, right: 150),
-            child: Text(
-              'QR code business card',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  void getUser() async {
-    http.Response res =
-        await http.get(Uri.parse('$baseUrl/users/${widget.id}'));
-
-    print(widget.id);
-    print(res.statusCode);
-    if (res.statusCode == 200) {
-      var decoded = jsonDecode(res.body);
-      setState(() {
-        user = User(
-          name: decoded['name'],
-          url: decoded['avatar'],
-          createdAt: decoded['createdAt'],
-        );
-      });
-    }
-  }
+  User({this.id, this.name, this.url, this.createdAt, this.mobile});
 }
