@@ -14,7 +14,7 @@ class DetailPage extends StatefulWidget {
   State<DetailPage> createState() => _DetailPageState();
 }
 
-String? baseUrl = 'https://628dd82ca339dfef87a17642.mockapi.io';
+String baseUrl = 'https://628dd82ca339dfef87a17642.mockapi.io';
 
 class _DetailPageState extends State<DetailPage> {
   List<User> users = [];
