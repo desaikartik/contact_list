@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'main.dart';
+
 class UpdateScreen extends StatefulWidget {
   final String? name;
   final String? mobile;
@@ -51,7 +53,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
                       if (widget.name != null && widget.mobile != null) {
                         updateUser();
                       } else {
-                        addUser();
+                        null;
+                        //addUser();
+
                       }
                     },
               icon: const Icon(
@@ -107,25 +111,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
     );
   }
 
-  void addUser() async {
-    if (name!.isNotEmpty && mobile!.isNotEmpty) {
-      setState(() => _isLoading = true);
-      http.Response res = await http.post(
-        Uri.parse('$baseUrl/users'),
-        body: {
-          "name": "$name",
-          "avatar": "$mobile",
-        },
-      );
-
-      if (res.statusCode == 201) {
-        Navigator.pop(context, true);
-        // https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/559.jpg
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
   void updateUser() async {
     if (name!.isNotEmpty && mobile!.isNotEmpty) {
       setState(() => _isLoading = true);
@@ -138,8 +123,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
       );
       print(res.statusCode);
       if (res.statusCode == 200) {
-        Navigator.pop(context, true);
-        // https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/559.jpg
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()));
+
         setState(() => _isLoading = false);
       }
     }

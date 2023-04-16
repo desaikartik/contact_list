@@ -97,12 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   onTap: () {
                     //inavigate with id
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            DetailPage(id: users[index].id),
-                      ),
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                DetailPage(id: users[index].id)));
                   },
                   leading:
                       //CircleAvatar(
